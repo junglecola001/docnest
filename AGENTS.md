@@ -43,6 +43,7 @@ CI（`.github/workflows/ci.yml`）跑同一组命令；Windows/Android 构建只
 5. **可测试性**：宿主核心保持纯 Dart（可 `dart test`）；平台差异通过接口注入（`PathProbe`、`ChunkSink`、`Mover`）。
 6. **生成代码**：`*.g.dart` / `*.freezed.dart` 提交入库，且保持生成器原样输出——`dart format` 检查会跳过它们（CI 的 `codegen` job 重新生成后要求 `git diff` 为空）。
 7. **Flutter 组件测试里的点击**：`flutter test` 不会编译依赖包的 shader，prism 的按压火花会报 `packages/prism_ui/shaders/…` 缺失。`apps/docnest/test` 用 `_ignorePrismShaderAssetError()` 精确忽略这一条，不要扩大范围。
+8. **Windows 路径**：重解析点看 `FILE_ATTRIBUTE_REPARSE_POINT`，不要用「规范化结果不同」来推断；包含性比较要同时接受配置形态与规范化形态（8.3 短名、`subst` 盘）。详见 ADR 0008。
 
 ## 已知待确认
 
