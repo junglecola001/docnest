@@ -7,8 +7,9 @@
 | 包 | 内容 | 验证方式 |
 |---|---|---|
 | `docnest_core` | `Root` / `DocEntry` / `DocDetail` / `FolderEntry` / `Tag` / `TrashTicket`、`DocQuery` / `PageOf`、`LibraryEvent`、`DocNestErrorCode` + `sealed AppException`、`LibraryRepository` 接口 | `dart test packages/docnest_core` |
-| `docnest_protocol` | `ApiPaths` / `ApiHeaders`、`HostInfoDto`、`RootDto`、`DocDto` / `ChildrenPageDto`、上传 DTO、配对 DTO、`EventDto`、`ApiErrorDto`、`PairingLink` | `dart test packages/docnest_protocol` |
-| `docnest_host` | `PathGuard`（含 TOCTOU 复核、重解析点检查）、`NameSanitizer`、`ConflictResolver`、`ExcludeGlobs`、`IoPathProbe`、断点续传状态机、扫描/对账、搜索分词与语法 | `dart test packages/docnest_host` |
+| `docnest_protocol` | `ApiPaths` / `ApiHeaders`、`HostInfoDto`、`RootDto`、`DocDto` / `ChildrenPageDto`、上传 DTO、配对 DTO、`EventDto`、`ApiErrorDto`、`PairingLink`、`EventMapper` / `DocMapper`（领域事件 ↔ 线上包络） | `dart test packages/docnest_protocol` |
+| `docnest_host` | `PathGuard`（TOCTOU 复核、重解析点属性位、8.3 短名兼容）、`RootValidator`（系统目录/嵌套/整盘校验）、`NameSanitizer`、`ConflictResolver`、`ExcludeGlobs`、`IoPathProbe`、断点续传状态机、扫描/对账、搜索分词与语法 | `dart test packages/docnest_host` |
+| `docnest_remote` | `createPinnedHttpClient` / `certificateFingerprint`（证书固定），有真实 TLS 服务器测试 | `dart test packages/docnest_remote` |
 | `docnest_ui` | prism_ui 隔离层：`AppTheme`、tokens、`DocNestUiLocalizations`、`MaterialBridge`、`AsyncView`、`DocNestAppRoot` | `flutter test packages/docnest_ui` |
 | `apps/docnest` | 外壳、导航、外观设置（强调色 / 风格 / 玻璃 / 深色模式） | `flutter test apps/docnest` |
 
