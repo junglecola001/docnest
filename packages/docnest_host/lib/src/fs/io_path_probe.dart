@@ -1,17 +1,28 @@
+import 'dart:ffi';
 import 'dart:io';
 
+import 'package:ffi/ffi.dart';
 import 'package:path/path.dart' as p;
 
 import '../path/path_guard.dart';
 
-/// [PathProbe] backed by `dart:io`.
+/// [PathProbe] backed by `dart:io` plus two Win32 calls.
 ///
-/// On Windows, `resolveSymbolicLinksSync` is implemented with
-/// `GetFinalPathNameByHandleW`, so the real-path check really is performed
-/// against an opened handle rather than against the text we were given. That is
-/// what closes the check-then-use window the plan calls out (§3.9 item 4).
+/// Two checks matter and neither can be answered from the path text alone:
+///
+///  * junctions are reported as ordinary directories by `dart:io`, so the
+///    `FILE_ATTRIBUTE_REPARSE_POINT` bit is read with `GetFileAttributesW`;
+///  * `resolveSymbolicLinksSync` calls `GetFinalPathNameByHandleW`, which is what
+///    closes the check-then-use window (plan §3.9 item 4).
+///
+/// Canonical paths are only used for containment, never to *infer* a reparse
+/// point: an 8.3 short name (`RUNNER~1`) or a `subst` drive resolves to a
+/// different string without any link being involved.
 class IoPathProbe implements PathProbe {
   const IoPathProbe();
+
+  static const int _fileAttributeReparsePoint = 0x400;
+  static const int _invalidFileAttributes = 0xFFFFFFFF;
 
   static const String _extendedPrefix = r'\\?\';
   static const String _extendedUncPrefix = r'\\?\UNC\';
@@ -27,16 +38,11 @@ class IoPathProbe implements PathProbe {
   @override
   bool isReparsePoint(String fullPath) {
     final type = FileSystemEntity.typeSync(fullPath, followLinks: false);
-    if (type == FileSystemEntityType.link) return true;
     if (type == FileSystemEntityType.notFound) return false;
-
-    // A junction (or a mounted volume) is a directory whose canonical path
-    // differs from the path used to reach it. Comparing canonical forms catches
-    // both without an FFI dependency; `docnest_win32` later reports the real
-    // FILE_ATTRIBUTE_REPARSE_POINT bit instead.
-    final canonical = realPath(fullPath);
-    if (canonical == null) return false;
-    return !p.windows.equals(canonical, _stripExtendedPrefix(p.windows.normalize(fullPath)));
+    if (type == FileSystemEntityType.link) return true;
+    if (!Platform.isWindows) return false;
+    final attributes = _attributesOf(fullPath);
+    return attributes != _invalidFileAttributes && (attributes & _fileAttributeReparsePoint) != 0;
   }
 
   @override
@@ -52,6 +58,15 @@ class IoPathProbe implements PathProbe {
     }
   }
 
+  static int _attributesOf(String fullPath) {
+    final pointer = fullPath.toNativeUtf16();
+    try {
+      return _getFileAttributesW(pointer);
+    } finally {
+      malloc.free(pointer);
+    }
+  }
+
   static String _stripExtendedPrefix(String path) {
     if (path.startsWith(_extendedUncPrefix)) {
       return r'\\' + path.substring(_extendedUncPrefix.length);
@@ -60,3 +75,9 @@ class IoPathProbe implements PathProbe {
     return path;
   }
 }
+
+typedef _GetFileAttributesNative = Uint32 Function(Pointer<Utf16>);
+typedef _GetFileAttributesDart = int Function(Pointer<Utf16>);
+
+final _GetFileAttributesDart _getFileAttributesW = DynamicLibrary.process()
+    .lookupFunction<_GetFileAttributesNative, _GetFileAttributesDart>('GetFileAttributesW');

@@ -219,8 +219,17 @@ class PathGuard {
     final real = _probe.realPath(full);
     if (real == null) return;
     final normalizedReal = p.windows.normalize(real);
-    if (!p.windows.isWithin(rootPath, normalizedReal) &&
-        !p.windows.equals(rootPath, normalizedReal)) {
+    // Compare against the canonical form of the root as well: the configured
+    // root may be an 8.3 short name (`RUNNER~1`) or a `subst` drive, and the
+    // canonical path of the file would otherwise look like a foreign directory.
+    final canonicalRoot = _probe.realPath(rootPath);
+    final roots = <String>[rootPath, if (canonicalRoot != null) p.windows.normalize(canonicalRoot)];
+    final inside = roots.any(
+      (candidate) =>
+          p.windows.equals(candidate, normalizedReal) ||
+          p.windows.isWithin(candidate, normalizedReal),
+    );
+    if (!inside) {
       throw PathOutsideRootException(
         message: 'Resolved path escapes its root',
         details: {'rootId': root.id.value, 'relPath': relPath},

@@ -16,9 +16,9 @@
 | `apps/docnest` 外壳、导航、设置（强调色 / 风格 / 主题 / 玻璃 / 字号） | ✅ |
 | HTTPS 服务、配对、索引数据库（drift）、预览管道 | 待做（M2 起） |
 
-尚未实现的部分不会以空壳形式占位：`docnest_remote`、`docnest_win32` 会在对应里程碑落地时加入 workspace。
+尚未实现的部分不会以空壳形式占位：`docnest_win32` 会在 M1/M2 需要回收站、Shell 缩略图与 FileId 时加入 workspace。
 
-本地已验证：`dart test` 共 189 项（core / protocol / host，含 PathGuard 的 3000 例模糊测试与 Windows 联接点回归测试），`flutter test` 共 21 项（docnest_ui 16、app 5）。Windows 与 Android 的构建由 GitHub Actions 执行。
+本地已验证：`dart test` 共 205 项（core / protocol / host / remote，含 PathGuard 的 3000 例模糊测试、Windows 联接点与 8.3 短名回归测试、真实 TLS 服务器上的证书固定测试），`flutter test` 共 21 项（docnest_ui 16、app 5）。Windows 与 Android 的构建由 GitHub Actions 执行。
 
 ## 环境
 

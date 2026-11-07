@@ -196,6 +196,28 @@ void main() {
       final guarded = PathGuard(probe: probe);
       expect(guarded.resolve(root(), 'ok.txt').relPath, 'ok.txt');
     });
+
+    test('an 8.3 short root is compared against its canonical form', () {
+      // GitHub's Windows runners expose TEMP through a short name (RUNNER~1).
+      // The canonical path then differs from the configured root without any
+      // link being involved, which used to look like an escape.
+      final probe = FakeProbe(
+        realPaths: {
+          r'C:\Users\RUNNER~1\AppData\Local\Temp\docs':
+              r'C:\Users\runneradmin\AppData\Local\Temp\docs',
+          r'C:\Users\RUNNER~1\AppData\Local\Temp\docs\a.txt':
+              r'C:\Users\runneradmin\AppData\Local\Temp\docs\a.txt',
+        },
+      );
+      final guarded = PathGuard(probe: probe);
+      const shortRoot = Root(
+        id: RootId(1),
+        path: r'C:\Users\RUNNER~1\AppData\Local\Temp\docs',
+        name: 'Docs',
+        status: RootStatus.watching,
+      );
+      expect(guarded.resolve(shortRoot, 'a.txt').relPath, 'a.txt');
+    });
   });
 
   group('write guard', () {

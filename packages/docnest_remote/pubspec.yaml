@@ -1,0 +1,19 @@
+name: docnest_remote
+description: Client side of DocNest - pinned HTTPS, discovery and the transfer queue.
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  crypto: ^3.0.6
+  docnest_core:
+    path: ../docnest_core
+  docnest_protocol:
+    path: ../docnest_protocol
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  test: ^1.25.0

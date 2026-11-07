@@ -71,11 +71,9 @@ class RootCheck {
 /// Pure and injectable: the system directories come from the caller so tests can
 /// use a fake Windows layout without depending on the machine running them.
 class RootValidator {
-  RootValidator({
-    required List<String> systemDirectories,
-    List<String>? protectedNames,
-  }) : _systemDirectories = systemDirectories.where((d) => d.isNotEmpty).toList(),
-       _protectedNames = protectedNames ?? defaultProtectedNames;
+  RootValidator({required List<String> systemDirectories, List<String>? protectedNames})
+    : _systemDirectories = systemDirectories.where((d) => d.isNotEmpty).toList(),
+      _protectedNames = protectedNames ?? defaultProtectedNames;
 
   /// Directory names that may never appear as any segment of a whitelisted
   /// path, even if the user points at them through a junction-free path.
@@ -96,10 +94,7 @@ class RootValidator {
   RootCheck check({required String candidatePath, required Iterable<Root> roots}) {
     final trimmed = candidatePath.trim();
     if (trimmed.isEmpty || !p.windows.isAbsolute(trimmed)) {
-      return RootCheck(
-        path: trimmed,
-        issues: const <RootIssue>[RootIssue.invalidPath],
-      );
+      return RootCheck(path: trimmed, issues: const <RootIssue>[RootIssue.invalidPath]);
     }
     final path = p.windows.normalize(trimmed);
     final issues = <RootIssue>[];

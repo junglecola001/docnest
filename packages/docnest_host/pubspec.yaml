@@ -13,6 +13,7 @@ dependencies:
     path: ../docnest_core
   docnest_protocol:
     path: ../docnest_protocol
+  ffi: ^2.1.4
   lpinyin: ^2.0.3
   path: ^1.9.1
 

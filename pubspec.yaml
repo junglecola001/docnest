@@ -9,5 +9,6 @@ workspace:
   - packages/docnest_core
   - packages/docnest_host
   - packages/docnest_protocol
+  - packages/docnest_remote
   - packages/docnest_ui
   - tools

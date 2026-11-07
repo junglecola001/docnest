@@ -14,11 +14,13 @@ const _pureDartPackages = {'docnest_core', 'docnest_protocol'};
 /// Files allowed to import Material (the bridge layer only).
 const _materialBridgeDir = 'packages/docnest_ui/lib/src/bridge/';
 
-/// Files allowed to branch on the platform (composition roots only).
+/// Files allowed to branch on the platform (composition roots and the platform
+/// probes that implement the injected interfaces).
 const _platformAllowedSuffixes = [
   'apps/docnest/lib/main.dart',
   'apps/docnest/lib/app/bootstrap_host.dart',
   'apps/docnest/lib/app/bootstrap_remote.dart',
+  'packages/docnest_host/lib/src/fs/io_path_probe.dart',
 ];
 
 final _directive = RegExp(r'''^\s*(?:import|export)\s+['"]([^'"]+)['"]''', multiLine: true);

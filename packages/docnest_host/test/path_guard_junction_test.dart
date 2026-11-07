@@ -85,4 +85,33 @@ void main() {
       throwsA(isA<PathOutsideRootException>()),
     );
   });
+
+  test('an 8.3 short path is not mistaken for a junction', () {
+    final longDirectory = Directory(
+      p.join(temp.path, 'A Very Long Directory Name To Force A Short Name'),
+    )..createSync();
+    File(p.join(longDirectory.path, 'file.txt')).writeAsStringSync('x');
+
+    final short = Process.runSync('cmd', <String>[
+      '/c',
+      'for %I in ("${longDirectory.path}") do @echo %~sI',
+    ], runInShell: true).stdout.toString().trim();
+    if (short.isEmpty || short.toLowerCase() == longDirectory.path.toLowerCase()) {
+      markTestSkipped('8.3 short names are not available on this volume');
+      return;
+    }
+
+    const probe = IoPathProbe();
+    expect(probe.isReparsePoint(p.join(short, 'file.txt')), isFalse);
+    expect(probe.isReparsePoint(short), isFalse);
+
+    const guard = PathGuard(probe: IoPathProbe());
+    final shortRoot = Root(
+      id: const RootId(1),
+      path: short,
+      name: 'Docs',
+      status: RootStatus.watching,
+    );
+    expect(guard.resolve(shortRoot, 'file.txt').relPath, 'file.txt');
+  });
 }

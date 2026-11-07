@@ -21,6 +21,7 @@ scripts:
       dart test packages/docnest_core
       dart test packages/docnest_protocol
       dart test packages/docnest_host
+      dart test packages/docnest_remote
       flutter test packages/docnest_ui
       flutter test apps/docnest
 

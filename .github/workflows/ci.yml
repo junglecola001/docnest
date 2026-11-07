@@ -72,6 +72,8 @@ jobs:
         run: dart test packages/docnest_protocol
       - name: docnest_host
         run: dart test packages/docnest_host
+      - name: docnest_remote
+        run: dart test packages/docnest_remote
 
   test-windows:
     name: Windows-only host tests
