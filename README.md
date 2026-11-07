@@ -33,6 +33,7 @@ flutter pub get          # workspace 统一解析
 dart test packages/docnest_core
 dart test packages/docnest_protocol
 dart test packages/docnest_host
+dart test packages/docnest_remote
 flutter test packages/docnest_ui
 flutter test apps/docnest
 dart run tools/bin/check_imports.dart
@@ -50,6 +51,7 @@ apps/docnest/           Flutter 应用（windows + android）
 packages/docnest_core/  纯 Dart 领域层：模型、错误、仓库接口
 packages/docnest_protocol/ 纯 Dart 协议层：DTO、路由、事件、配对链接
 packages/docnest_host/  宿主核心：PathGuard、扫描、上传、搜索（纯 Dart，可 dart test）
+packages/docnest_remote/ 客户端核心：证书固定（发现与传输队列属于 M2/M3）
 packages/docnest_ui/    prism_ui 隔离层：主题、tokens、本地化、桥接
 tools/                  仓库脚本（import 规则检查）
 docs/adr/               架构决策记录
