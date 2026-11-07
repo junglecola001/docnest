@@ -12,6 +12,7 @@ export 'src/path/conflict_resolver.dart';
 export 'src/path/name_sanitizer.dart';
 export 'src/path/path_guard.dart';
 export 'src/path/resolved_path.dart';
+export 'src/roots/root_validator.dart';
 export 'src/scan/index_store.dart';
 export 'src/scan/reconciler.dart';
 export 'src/scan/scanned_file.dart';
