@@ -12,6 +12,8 @@ export 'src/dto/host_info_dto.dart';
 export 'src/dto/pair_dtos.dart';
 export 'src/dto/root_dto.dart';
 export 'src/dto/upload_dtos.dart';
+export 'src/events/doc_mapper.dart';
+export 'src/events/event_mapper.dart';
 export 'src/json.dart';
 export 'src/pairing_link.dart';
 export 'src/protocol_version.dart';

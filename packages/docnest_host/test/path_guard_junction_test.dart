@@ -44,7 +44,13 @@ void main() {
     const probe = IoPathProbe();
     expect(probe.isReparsePoint(p.join(target.path, 'link')), isTrue);
     expect(probe.isReparsePoint(p.join(target.path, 'normal')), isFalse);
-    expect(probe.realPath(p.join(target.path, 'link'))!.toLowerCase(), outside.path.toLowerCase());
+    // realPath is canonical, so it comes back in long form even when the temp
+    // directory was reached through an 8.3 short name (`RUNNER~1`).
+    final canonicalOutside = Directory(outside.path).resolveSymbolicLinksSync();
+    expect(
+      probe.realPath(p.join(target.path, 'link'))!.toLowerCase(),
+      canonicalOutside.toLowerCase(),
+    );
   });
 
   test('PathGuard blocks reads and writes through a junction', () {
