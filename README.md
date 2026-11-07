@@ -11,12 +11,14 @@
 | 单仓多包骨架 + CI | ✅ |
 | `docnest_core` 领域模型、错误、仓库接口 | ✅ |
 | `docnest_protocol` DTO / 路由 / 配对链接 / 事件 | ✅ |
-| `docnest_host` PathGuard、文件名清洗、冲突命名、排除规则、断点续传状态机、扫描对账、搜索分词 | ✅ |
-| `docnest_ui` 主题、tokens、prism_ui 中文本地化、Material 桥接 | ✅ |
-| `apps/docnest` 外壳、导航、设置（主题色 / 风格） | ✅ |
+| `docnest_host` PathGuard（含联接点与 TOCTOU）、文件名清洗、冲突命名、排除规则、断点续传状态机、扫描对账、搜索分词 | ✅ |
+| `docnest_ui` 主题、tokens、prism_ui 中英文本地化、Material 桥接 | ✅ |
+| `apps/docnest` 外壳、导航、设置（强调色 / 风格 / 主题 / 玻璃 / 字号） | ✅ |
 | HTTPS 服务、配对、索引数据库（drift）、预览管道 | 待做（M2 起） |
 
 尚未实现的部分不会以空壳形式占位：`docnest_remote`、`docnest_win32` 会在对应里程碑落地时加入 workspace。
+
+本地已验证：`dart test` 共 189 项（core / protocol / host，含 PathGuard 的 3000 例模糊测试与 Windows 联接点回归测试），`flutter test` 共 21 项（docnest_ui 16、app 5）。Windows 与 Android 的构建由 GitHub Actions 执行。
 
 ## 环境
 
@@ -57,8 +59,10 @@ docs/adr/               架构决策记录
 
 `/.github/workflows/ci.yml`：
 
-- `check`（ubuntu）：format、analyze、import 规则
+- `check`（ubuntu）：format（跳过生成代码）、analyze、import 规则
+- `codegen`（ubuntu）：`flutter gen-l10n` + `build_runner`，要求 `git diff` 为空
 - `test-dart`（ubuntu）：core / protocol / host 单元测试
+- `test-windows`（windows）：host 测试，覆盖联接点与 Windows 路径语义
 - `test-flutter`（ubuntu）：docnest_ui、app 组件测试
 - `build-windows` / `build-android`：仅在 main、tag、手动触发时运行，产物上传为 artifact
 - `release`：打 `v*` tag 时汇总产物并生成 Release Notes

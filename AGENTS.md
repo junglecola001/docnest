@@ -41,6 +41,8 @@ CI（`.github/workflows/ci.yml`）跑同一组命令；Windows/Android 构建只
 3. **依赖方向**：core ← protocol ← host/remote/ui；UI 只 import `docnest_ui`（它再导出 prism_ui）。
 4. **错误**：跨层只抛 `AppException` 子类；未知错误包成 `UnknownException`，界面只显示错误编号。
 5. **可测试性**：宿主核心保持纯 Dart（可 `dart test`）；平台差异通过接口注入（`PathProbe`、`ChunkSink`、`Mover`）。
+6. **生成代码**：`*.g.dart` / `*.freezed.dart` 提交入库，且保持生成器原样输出——`dart format` 检查会跳过它们（CI 的 `codegen` job 重新生成后要求 `git diff` 为空）。
+7. **Flutter 组件测试里的点击**：`flutter test` 不会编译依赖包的 shader，prism 的按压火花会报 `packages/prism_ui/shaders/…` 缺失。`apps/docnest/test` 用 `_ignorePrismShaderAssetError()` 精确忽略这一条，不要扩大范围。
 
 ## 已知待确认
 

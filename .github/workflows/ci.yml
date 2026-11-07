@@ -73,6 +73,20 @@ jobs:
       - name: docnest_host
         run: dart test packages/docnest_host
 
+  test-windows:
+    name: Windows-only host tests
+    # Junctions and Windows path semantics cannot be exercised on Linux.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: dart test packages/docnest_host
+
   test-flutter:
     name: Flutter widget tests
     runs-on: ubuntu-latest
