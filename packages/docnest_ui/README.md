@@ -16,6 +16,7 @@ are enforced by `tools/bin/check_imports.dart`.
 | `lib/src/app/docnest_app_root.dart` | `DocNestAppRoot`: a `PrismApp` with the required delegates and a `ViewScope` published above the routes. |
 | `lib/src/bridge/material_bridge.dart` | `MaterialBridge`: the only file allowed to import Material, wrapping pdfrx and markdown subtrees in a Material theme derived from prism's. |
 | `lib/src/components/async_view.dart` | `AsyncView<T>`: skeleton, failure-with-retry and data states for a riverpod `AsyncValue`. |
+| `lib/src/icons/app_glyphs.dart` | `AppGlyphs`: the destinations and file kinds prism does not ship (Lucide path data, ISC). |
 
 ## Rules
 
