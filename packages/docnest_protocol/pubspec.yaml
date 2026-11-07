@@ -1,0 +1,16 @@
+name: docnest_protocol
+description: Wire protocol for DocNest - DTOs, routes, pairing links and event envelopes.
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  docnest_core:
+    path: ../docnest_core
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  test: ^1.25.0

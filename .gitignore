@@ -1,0 +1,44 @@
+# Dart / Flutter
+.dart_tool/
+.packages
+build/
+.pub-cache/
+.pub/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.idea/
+.vscode/
+coverage/
+*.lock.bak
+
+# FVM
+.fvm/flutter_sdk
+.fvm/versions
+
+# Melos
+pubspec_overrides.yaml
+
+# Windows build artifacts
+apps/docnest/windows/flutter/ephemeral/
+windows/flutter/ephemeral/
+
+# Android
+apps/docnest/android/.gradle/
+apps/docnest/android/local.properties
+apps/docnest/android/key.properties
+apps/docnest/android/app/*.jks
+apps/docnest/android/app/*.keystore
+
+# Test / device output
+integration_test/failures/
+*.fail.png
+test/failures/
+
+# OS noise
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# gen-l10n untranslated report
+apps/docnest/l10n-untranslated.json

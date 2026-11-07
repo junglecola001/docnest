@@ -1,0 +1,40 @@
+{
+  "@@locale": "en",
+  "appTitle": "DocNest",
+  "navLibrary": "Library",
+  "navSearch": "Search",
+  "navTransfers": "Transfers",
+  "navSettings": "Settings",
+  "libraryEmptyTitle": "No folders yet",
+  "libraryEmptyBody": "Indexing arrives with milestone M1: add whitelisted folders, scan them, then browse, search and preview here.",
+  "searchEmptyTitle": "Search is not connected yet",
+  "searchEmptyBody": "Search runs on the host index. It becomes available once the index database lands in M1.",
+  "transfersEmptyTitle": "No transfers",
+  "transfersEmptyBody": "Pairing and transfers arrive with milestones M2 and M3.",
+  "settingsAppearance": "Appearance",
+  "settingsAccentColor": "Accent color",
+  "settingsAccentColorHint": "One color defines the whole app.",
+  "settingsColorStyle": "Color style",
+  "styleVivid": "Vivid",
+  "styleTinted": "Tinted",
+  "styleSoft": "Soft",
+  "styleMonochrome": "Monochrome",
+  "settingsThemeMode": "Theme",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "settingsGlass": "Liquid glass",
+  "settingsGlassOff": "Off",
+  "settingsGlassStandard": "Standard",
+  "settingsGlassUltra": "Ultra",
+  "settingsTextScale": "Text size",
+  "settingsAbout": "About",
+  "settingsVersion": "Version {version}",
+  "@settingsVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  }
+}

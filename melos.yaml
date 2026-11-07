@@ -1,0 +1,32 @@
+name: docnest
+
+packages:
+  - apps/**
+  - packages/**
+  - tools
+
+command:
+  bootstrap:
+    runPubGetInParallel: true
+    usePubspecOverrides: false
+
+scripts:
+  gen:
+    description: 生成 freezed / drift / riverpod / l10n 代码
+    run: dart run build_runner build --delete-conflicting-outputs
+
+  test:
+    description: 运行全部纯 Dart 与 Flutter 测试
+    run: |
+      dart test packages/docnest_core
+      dart test packages/docnest_protocol
+      dart test packages/docnest_host
+      flutter test packages/docnest_ui
+      flutter test apps/docnest
+
+  check:
+    description: format + analyze + import 规则
+    run: |
+      dart format --output=none --set-exit-if-changed .
+      flutter analyze --fatal-infos
+      dart run tools/bin/check_imports.dart

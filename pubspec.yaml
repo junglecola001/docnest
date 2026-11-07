@@ -1,0 +1,13 @@
+name: docnest_workspace
+publish_to: none
+
+environment:
+  sdk: ^3.10.0
+
+workspace:
+  - apps/docnest
+  - packages/docnest_core
+  - packages/docnest_host
+  - packages/docnest_protocol
+  - packages/docnest_ui
+  - tools

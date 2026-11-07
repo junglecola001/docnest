@@ -1,0 +1,12 @@
+name: docnest_core
+description: Pure-Dart domain layer for DocNest - models, enums, errors, repository interfaces.
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.10.0
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  test: ^1.25.0

@@ -1,0 +1,647 @@
+openapi: 3.1.0
+info:
+  title: DocNest Host API
+  version: '1'
+  description: |
+    宿主对已配对设备开放的局域网接口。约定：
+
+    - 所有 JSON 字段 lowerCamelCase；时间戳为 ISO-8601 UTC。
+    - 文档定位只用 `docId` 或 `(rootId, 相对路径)`，从不接受绝对路径。
+    - 列表一律游标分页：`?cursor=&limit=`。
+    - 错误统一为 `{ "error": { "code", "message", "details" } }`。
+    - 本文件与 `packages/docnest_protocol` 必须在同一提交中修改。
+servers:
+  - url: https://{host}:{port}/api/v1
+    variables:
+      host:
+        default: 192.168.1.8
+      port:
+        default: '53420'
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    DocId:
+      name: docId
+      in: path
+      required: true
+      schema:
+        type: integer
+  schemas:
+    ErrorCode:
+      type: string
+      enum:
+        - UNAUTHORIZED
+        - TOKEN_REVOKED
+        - FORBIDDEN_SCOPE
+        - ROOT_NOT_FOUND
+        - ROOT_OFFLINE
+        - ROOT_READ_ONLY
+        - PATH_OUTSIDE_ROOT
+        - INVALID_NAME
+        - NAME_CONFLICT
+        - NOT_FOUND
+        - FILE_LOCKED
+        - INSUFFICIENT_SPACE
+        - UPLOAD_OFFSET_MISMATCH
+        - UPLOAD_EXPIRED
+        - CHECKSUM_MISMATCH
+        - PREVIEW_UNAVAILABLE
+        - RATE_LIMITED
+        - PROTOCOL_UNSUPPORTED
+        - INVALID_REQUEST
+        - INTERNAL
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorCode'
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          $ref: '#/components/schemas/Error'
+    HostInfo:
+      type: object
+      required: [hostId, name, appVersion, protocolVersion, minClientProtocol, indexEpoch]
+      properties:
+        hostId:
+          type: string
+        name:
+          type: string
+        appVersion:
+          type: string
+        protocolVersion:
+          type: integer
+        minClientProtocol:
+          type: integer
+        indexEpoch:
+          type: integer
+          description: 宿主每次重建索引都会递增；客户端据此清空按 docId 的缓存。
+        capabilities:
+          type: array
+          items:
+            type: string
+            enum: [contentSearch, officePreview, thumbnails, offers, uploads, tags]
+    Root:
+      type: object
+      required: [id, name, status, docCount]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        status:
+          type: string
+          enum: [checking, scanning, watching, offline, error]
+        docCount:
+          type: integer
+        color:
+          type: integer
+          description: ARGB，省略表示使用主题默认色。
+        writable:
+          type: boolean
+        uploadTarget:
+          type: boolean
+        scanProgress:
+          type: number
+          minimum: 0
+          maximum: 1
+    Doc:
+      type: object
+      required: [id, rootId, relPath, name, ext, kind, size, modifiedAt]
+      properties:
+        id:
+          type: integer
+        rootId:
+          type: integer
+        relPath:
+          type: string
+          description: 相对根目录，`/` 分隔。
+        name:
+          type: string
+        ext:
+          type: string
+        kind:
+          type: string
+          enum: [pdf, word, spreadsheet, presentation, text, markdown, ebook, image, archive, audio, video, other]
+        size:
+          type: integer
+        modifiedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        state:
+          type: string
+          enum: [active, missing]
+        favorite:
+          type: boolean
+        tagIds:
+          type: array
+          items:
+            type: integer
+        hasThumbnail:
+          type: boolean
+    Folder:
+      type: object
+      required: [id, rootId, relPath, name]
+      properties:
+        id:
+          type: integer
+        rootId:
+          type: integer
+        relPath:
+          type: string
+        name:
+          type: string
+        childCount:
+          type: integer
+    DocPage:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Doc'
+        nextCursor:
+          type: string
+    ChildrenPage:
+      type: object
+      required: [folders, docs]
+      properties:
+        folders:
+          type: array
+          items:
+            $ref: '#/components/schemas/Folder'
+        docs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Doc'
+        nextCursor:
+          type: string
+    PairRequest:
+      type: object
+      required: [code, deviceName, platform, model, clientProtocol]
+      properties:
+        code:
+          type: string
+        deviceName:
+          type: string
+        platform:
+          type: string
+        model:
+          type: string
+        clientProtocol:
+          type: integer
+        compareCode:
+          type: string
+          description: 无相机配对时，两端显示并比对的 6 位数字。
+    PairResponse:
+      type: object
+      required: [deviceId, token, hostId, hostName, protocolVersion, scopes]
+      properties:
+        deviceId:
+          type: string
+        token:
+          type: string
+        hostId:
+          type: string
+        hostName:
+          type: string
+        protocolVersion:
+          type: integer
+        scopes:
+          type: array
+          items:
+            type: string
+            enum: [browse, upload, manage, delete]
+    UploadInitRequest:
+      type: object
+      required: [rootId, dir, fileName, size, modifiedAt]
+      properties:
+        rootId:
+          type: integer
+        dir:
+          type: string
+        fileName:
+          type: string
+        size:
+          type: integer
+        modifiedAt:
+          type: string
+          format: date-time
+        onConflict:
+          type: string
+          enum: [rename, skip, overwrite]
+          default: rename
+    UploadInitResponse:
+      type: object
+      required: [uploadId, chunkSize, offset, expiresAt]
+      properties:
+        uploadId:
+          type: string
+        chunkSize:
+          type: integer
+        offset:
+          type: integer
+        expiresAt:
+          type: string
+          format: date-time
+    UploadStatus:
+      type: object
+      required: [uploadId, offset, size, state]
+      properties:
+        uploadId:
+          type: string
+        offset:
+          type: integer
+        size:
+          type: integer
+        state:
+          type: string
+          enum: [open, completed, cancelled, expired]
+        expiresAt:
+          type: string
+          format: date-time
+    UploadCompleteResponse:
+      type: object
+      required: [docId, finalName, relPath, skipped]
+      properties:
+        docId:
+          type: integer
+        finalName:
+          type: string
+        relPath:
+          type: string
+        skipped:
+          type: boolean
+paths:
+  /info:
+    get:
+      summary: 宿主信息与能力（无需令牌）
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HostInfo'
+  /pair:
+    post:
+      summary: 配对（仅在配对窗口内有效，错误码 UNAUTHORIZED / RATE_LIMITED）
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PairRequest'
+      responses:
+        '201':
+          description: 配对成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PairResponse'
+        '401':
+          description: 配对码错误或窗口已关闭
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /roots:
+    get:
+      summary: 对当前设备可见的根目录
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Root'
+  /roots/{rootId}/children:
+    get:
+      summary: 列出文件夹子项
+      parameters:
+        - name: rootId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: path
+          in: query
+          schema:
+            type: string
+            default: ''
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [name, modified, created, size, kind]
+        - name: dir
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            maximum: 500
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChildrenPage'
+        '404':
+          description: 根目录或路径不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /docs:
+    get:
+      summary: 搜索与筛选
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - name: ext
+          in: query
+          schema:
+            type: string
+        - name: root
+          in: query
+          schema:
+            type: integer
+        - name: modified
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [name, modified, created, size, kind]
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            maximum: 500
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocPage'
+  /docs/{docId}:
+    get:
+      summary: 文档详情
+      parameters:
+        - $ref: '#/components/parameters/DocId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Doc'
+    patch:
+      summary: 重命名 / 收藏 / 备注
+      parameters:
+        - $ref: '#/components/parameters/DocId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                favorite:
+                  type: boolean
+                note:
+                  type: [string, 'null']
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Doc'
+  /docs/{docId}/content:
+    get:
+      summary: 原文件（支持 Range / ETag / If-Range）
+      parameters:
+        - $ref: '#/components/parameters/DocId'
+      responses:
+        '200':
+          description: 完整文件
+        '206':
+          description: 部分内容
+        '416':
+          description: Range 不可满足
+  /docs/{docId}/thumbnail:
+    get:
+      summary: 缩略图（支持 ETag）
+      parameters:
+        - $ref: '#/components/parameters/DocId'
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 256
+      responses:
+        '200':
+          description: 图片字节
+        '404':
+          description: 尚未生成（重试或触发 job）
+  /docs/{docId}/preview:
+    get:
+      summary: 预览版本（PDF / 缩放图片 / UTF-8 文本）
+      parameters:
+        - $ref: '#/components/parameters/DocId'
+      responses:
+        '200':
+          description: 预览内容
+        '202':
+          description: 转换中
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+        '501':
+          description: PREVIEW_UNAVAILABLE
+  /docs/{docId}/open-on-host:
+    post:
+      summary: 在电脑上用默认程序打开（仅文档类型，拒绝可执行文件）
+      parameters:
+        - $ref: '#/components/parameters/DocId'
+      responses:
+        '204':
+          description: 已请求
+  /uploads:
+    post:
+      summary: 创建（或恢复）上传会话
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadInitRequest'
+      responses:
+        '201':
+          description: 会话已创建
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadInitResponse'
+        '400':
+          description: INVALID_NAME / PATH_OUTSIDE_ROOT
+        '409':
+          description: 空间不足或名称冲突
+  /uploads/{uploadId}:
+    parameters:
+      - name: uploadId
+        in: path
+        required: true
+        schema:
+          type: string
+    head:
+      summary: 查询已接收的偏移量（断点续传）
+      responses:
+        '200':
+          description: OK
+          headers:
+            Upload-Offset:
+              schema:
+                type: integer
+              required: true
+    put:
+      summary: 写入分块（顺序发送）
+      parameters:
+        - name: Upload-Offset
+          in: header
+          required: true
+          schema:
+            type: integer
+        - name: Chunk-SHA256
+          in: header
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/offset+octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: 已接受
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [offset]
+                properties:
+                  offset:
+                    type: integer
+        '409':
+          description: UPLOAD_OFFSET_MISMATCH
+        '410':
+          description: UPLOAD_EXPIRED
+    delete:
+      summary: 取消上传并删除 .part
+      responses:
+        '204':
+          description: 已取消
+  /uploads/{uploadId}/complete:
+    post:
+      summary: 校验并原子落盘
+      parameters:
+        - name: uploadId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: File-SHA256
+          in: header
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 完成
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadCompleteResponse'
+        '409':
+          description: NAME_CONFLICT / CHECKSUM_MISMATCH
+  /offers:
+    get:
+      summary: 电脑推送给本设备、尚未接收的文件
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    offerId:
+                      type: string
+                    docId:
+                      type: integer
+                    expiresAt:
+                      type: string
+                      format: date-time
+  /events:
+    get:
+      summary: WebSocket 实时事件（握手同样带 Bearer token）
+      description: |
+        事件带递增 `seq`。重连时带最后收到的序号，宿主从缓冲区补发；
+        超出缓冲区则下发 `resync` 提示客户端整页刷新。
+      responses:
+        '101':
+          description: 升级为 WebSocket

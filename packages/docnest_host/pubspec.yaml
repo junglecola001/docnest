@@ -1,0 +1,21 @@
+name: docnest_host
+description: Host-side core for DocNest - path guarding, scanning, indexing, uploads, search and the LAN service.
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  crypto: ^3.0.6
+  docnest_core:
+    path: ../docnest_core
+  docnest_protocol:
+    path: ../docnest_protocol
+  lpinyin: ^2.0.3
+  path: ^1.9.1
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  test: ^1.25.0

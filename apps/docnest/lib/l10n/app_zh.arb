@@ -1,0 +1,40 @@
+{
+  "@@locale": "zh",
+  "appTitle": "DocNest",
+  "navLibrary": "资料库",
+  "navSearch": "搜索",
+  "navTransfers": "传输",
+  "navSettings": "设置",
+  "libraryEmptyTitle": "还没有添加文件夹",
+  "libraryEmptyBody": "索引将在 M1 落地：加入白名单文件夹并完成扫描后，就在这里浏览、搜索和预览。",
+  "searchEmptyTitle": "搜索还没有接入",
+  "searchEmptyBody": "搜索在宿主的索引上执行，M1 完成索引数据库后可用。",
+  "transfersEmptyTitle": "没有传输任务",
+  "transfersEmptyBody": "配对与互传将在 M2、M3 落地。",
+  "settingsAppearance": "外观",
+  "settingsAccentColor": "强调色",
+  "settingsAccentColorHint": "一个颜色定义整个应用。",
+  "settingsColorStyle": "配色风格",
+  "styleVivid": "鲜明",
+  "styleTinted": "沉浸",
+  "styleSoft": "柔和",
+  "styleMonochrome": "单色",
+  "settingsThemeMode": "主题",
+  "themeSystem": "跟随系统",
+  "themeLight": "浅色",
+  "themeDark": "深色",
+  "settingsGlass": "液态玻璃",
+  "settingsGlassOff": "关闭",
+  "settingsGlassStandard": "标准",
+  "settingsGlassUltra": "极致",
+  "settingsTextScale": "文字大小",
+  "settingsAbout": "关于",
+  "settingsVersion": "版本 {version}",
+  "@settingsVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  }
+}

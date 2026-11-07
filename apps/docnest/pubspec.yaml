@@ -1,0 +1,37 @@
+name: docnest
+description: DocNest - local-first document manager (Windows host, Android remote).
+publish_to: none
+version: 0.1.0+1
+resolution: workspace
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: ^3.5.0
+  riverpod_annotation: ^4.0.8
+  docnest_core:
+    path: ../../packages/docnest_core
+  docnest_host:
+    path: ../../packages/docnest_host
+  docnest_protocol:
+    path: ../../packages/docnest_protocol
+  docnest_ui:
+    path: ../../packages/docnest_ui
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.0
+  riverpod_generator: ^4.0.0
+
+flutter:
+  generate: true
+  uses-material-design: true
