@@ -66,7 +66,7 @@ docs/adr/               架构决策记录
 - `test-dart`（ubuntu）：core / protocol / host 单元测试
 - `test-windows`（windows）：host 测试，覆盖联接点与 Windows 路径语义
 - `test-flutter`（ubuntu）：docnest_ui、app 组件测试
-- `build-windows` / `build-android`：仅在 main、tag、手动触发时运行，产物上传为 artifact
+- `build-windows` / `build-android`：仅在 main、tag、手动触发时运行，产物上传为 artifact。Android 目前沿用模板的 debug keystore 签名，正式发布前需要在 Secrets 中配置签名密钥。
 - `release`：打 `v*` tag 时汇总产物并生成 Release Notes
 
 ## 许可证
