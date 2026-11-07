@@ -11,32 +11,43 @@ import 'package:test/test.dart';
 /// The fake-probe tests cover the logic; this one covers the platform: it needs
 /// `mklink /J`, so it is skipped where junctions are unavailable.
 void main() {
-  late Directory temp;
+  Directory? temp;
   late Directory target;
   late Directory outside;
   var junctionsSupported = false;
 
   setUpAll(() {
+    if (!Platform.isWindows) {
+      // `cmd`/`mklink` do not exist elsewhere; the fake-probe tests cover the
+      // logic, so nothing here needs to run off Windows.
+      junctionsSupported = false;
+      return;
+    }
     temp = Directory.systemTemp.createTempSync('docnest_junction_');
-    target = Directory(p.join(temp.path, 'Docs'))..createSync();
-    outside = Directory(p.join(temp.path, 'Outside'))..createSync();
+    target = Directory(p.join(temp!.path, 'Docs'))..createSync();
+    outside = Directory(p.join(temp!.path, 'Outside'))..createSync();
     Directory(p.join(target.path, 'normal')).createSync();
     File(p.join(outside.path, 'secret.txt')).writeAsStringSync('secret');
     // No `runInShell`: Dart quotes each argument itself. Going through a nested
     // shell made cmd parse the path's spaces as separate tokens, and on CI it
     // left a shell waiting for input.
-    final result = Process.runSync('cmd.exe', <String>[
-      '/c',
-      'mklink',
-      '/J',
-      p.join(target.path, 'link'),
-      outside.path,
-    ]);
-    junctionsSupported = result.exitCode == 0;
+    try {
+      final result = Process.runSync('cmd.exe', <String>[
+        '/c',
+        'mklink',
+        '/J',
+        p.join(target.path, 'link'),
+        outside.path,
+      ]);
+      junctionsSupported = result.exitCode == 0;
+    } on ProcessException {
+      junctionsSupported = false;
+    }
   });
 
   tearDownAll(() {
-    if (temp.existsSync()) temp.deleteSync(recursive: true);
+    final directory = temp;
+    if (directory != null && directory.existsSync()) directory.deleteSync(recursive: true);
   });
 
   test('IoPathProbe sees the junction as a reparse point', () {
@@ -96,8 +107,12 @@ void main() {
   });
 
   test('an 8.3 short path is not mistaken for a junction', () {
+    if (!Platform.isWindows) {
+      markTestSkipped('8.3 short names are a Windows concept');
+      return;
+    }
     final longDirectory = Directory(
-      p.join(temp.path, 'A Very Long Directory Name To Force A Short Name'),
+      p.join(temp!.path, 'A Very Long Directory Name To Force A Short Name'),
     )..createSync();
     File(p.join(longDirectory.path, 'file.txt')).writeAsStringSync('x');
 
@@ -108,8 +123,8 @@ void main() {
       '-NoProfile',
       '-NonInteractive',
       '-Command',
-      "(New-Object -ComObject Scripting.FileSystemObject)"
-          ".GetFolder('${longDirectory.path}').ShortPath",
+      "(New-Object -ComObject Scripting.FileSystemObject).GetFolder('${longDirectory.path}')"
+          '.ShortPath',
     ]).stdout.toString().trim();
     if (short.isEmpty || short.toLowerCase() == longDirectory.path.toLowerCase()) {
       markTestSkipped('8.3 short names are not available on this volume');
