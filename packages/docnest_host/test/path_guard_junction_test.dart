@@ -22,13 +22,16 @@ void main() {
     outside = Directory(p.join(temp.path, 'Outside'))..createSync();
     Directory(p.join(target.path, 'normal')).createSync();
     File(p.join(outside.path, 'secret.txt')).writeAsStringSync('secret');
-    final result = Process.runSync('cmd', <String>[
+    // No `runInShell`: Dart quotes each argument itself. Going through a nested
+    // shell made cmd parse the path's spaces as separate tokens, and on CI it
+    // left a shell waiting for input.
+    final result = Process.runSync('cmd.exe', <String>[
       '/c',
       'mklink',
       '/J',
       p.join(target.path, 'link'),
       outside.path,
-    ], runInShell: true);
+    ]);
     junctionsSupported = result.exitCode == 0;
   });
 
@@ -98,10 +101,16 @@ void main() {
     )..createSync();
     File(p.join(longDirectory.path, 'file.txt')).writeAsStringSync('x');
 
-    final short = Process.runSync('cmd', <String>[
-      '/c',
-      'for %I in ("${longDirectory.path}") do @echo %~sI',
-    ], runInShell: true).stdout.toString().trim();
+    // PowerShell rather than a `for` loop typed into cmd: the path contains
+    // spaces, and quoting a cmd builtin inside another shell is what hung the
+    // Windows runner.
+    final short = Process.runSync('powershell.exe', <String>[
+      '-NoProfile',
+      '-NonInteractive',
+      '-Command',
+      "(New-Object -ComObject Scripting.FileSystemObject)"
+          ".GetFolder('${longDirectory.path}').ShortPath",
+    ]).stdout.toString().trim();
     if (short.isEmpty || short.toLowerCase() == longDirectory.path.toLowerCase()) {
       markTestSkipped('8.3 short names are not available on this volume');
       return;
