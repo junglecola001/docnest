@@ -45,7 +45,7 @@ Root root({
 }
 
 void main() {
-  final guard = PathGuard();
+  const guard = PathGuard();
 
   group('accepts legitimate relative paths', () {
     test('nested path is joined under the root', () {

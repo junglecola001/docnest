@@ -34,8 +34,23 @@ Future<void> _openSettings(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+/// Swallows exactly one harness limitation: prism's press sparkle loads a GPU
+/// shader, and `flutter test` does not compile a dependency's shaders into the
+/// test asset manifest, so every tap on a prism button reports a missing
+/// `packages/prism_ui/shaders/…` asset. Real builds do bundle it (prism_ui
+/// declares it in its own pubspec). Anything other than that asset still fails.
+void _ignorePrismShaderAssetError() {
+  final previous = FlutterError.onError;
+  FlutterError.onError = (FlutterErrorDetails details) {
+    if (details.exception.toString().contains('packages/prism_ui/shaders/')) return;
+    previous?.call(details);
+  };
+  addTearDown(() => FlutterError.onError = previous);
+}
+
 void main() {
   testWidgets('shows the four destinations and re-seeds the theme from a swatch', (tester) async {
+    _ignorePrismShaderAssetError();
     await _pumpApp(tester);
 
     for (final label in <String>['资料库', '搜索', '传输', '设置']) {
@@ -49,6 +64,7 @@ void main() {
 
     await _openSettings(tester);
     expect(find.byType(SettingsPage), findsOneWidget);
+    expect(find.byKey(const ValueKey<String>('appearance-seed-5')), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey<String>('appearance-seed-5')));
     await tester.pumpAndSettle();
@@ -63,6 +79,7 @@ void main() {
   });
 
   testWidgets('switching theme mode to dark resolves the dark theme', (tester) async {
+    _ignorePrismShaderAssetError();
     await _pumpApp(tester);
 
     expect(_brightnessOf(tester), Brightness.light);

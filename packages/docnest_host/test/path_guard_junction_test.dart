@@ -52,7 +52,7 @@ void main() {
       markTestSkipped('junctions are not available on this platform');
       return;
     }
-    final guard = PathGuard(probe: const IoPathProbe());
+    const guard = PathGuard(probe: IoPathProbe());
     final root = Root(
       id: const RootId(1),
       path: target.path,
@@ -70,7 +70,7 @@ void main() {
       markTestSkipped('junctions are not available on this platform');
       return;
     }
-    final guard = PathGuard(probe: const IoPathProbe());
+    const guard = PathGuard(probe: IoPathProbe());
     final permissive = Root(
       id: const RootId(1),
       path: target.path,

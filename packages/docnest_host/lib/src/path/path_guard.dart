@@ -48,7 +48,7 @@ class NoopPathProbe implements PathProbe {
 /// whitelisted folder; see plan §3.9 item 4. Never bypass it, and never accept
 /// an absolute path from a client.
 class PathGuard {
-  PathGuard({PathProbe probe = const NoopPathProbe()}) : _probe = probe;
+  const PathGuard({PathProbe probe = const NoopPathProbe()}) : _probe = probe;
 
   final PathProbe _probe;
 
