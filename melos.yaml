@@ -27,6 +27,7 @@ scripts:
   check:
     description: format + analyze + import 规则
     run: |
-      dart format --output=none --set-exit-if-changed .
+      files=$(git ls-files '*.dart' | grep -vE '\.(g|freezed)\.dart$')
+      dart format --output=none --set-exit-if-changed $files
       flutter analyze --fatal-infos
       dart run tools/bin/check_imports.dart

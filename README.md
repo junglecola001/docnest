@@ -34,7 +34,8 @@ dart test packages/docnest_host
 flutter test packages/docnest_ui
 flutter test apps/docnest
 dart run tools/bin/check_imports.dart
-dart format --set-exit-if-changed .
+files=$(git ls-files '*.dart' | grep -vE '\.(g|freezed)\.dart$')
+dart format --output=none --set-exit-if-changed $files
 flutter analyze --fatal-infos
 ```
 

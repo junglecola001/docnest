@@ -48,13 +48,8 @@ void main() {
   ];
 
   test('3000 random hostile names never escape the root', () {
-    final guard = PathGuard();
-    final root = Root(
-      id: const RootId(1),
-      path: rootPath,
-      name: 'Docs',
-      status: RootStatus.watching,
-    );
+    const guard = PathGuard();
+    const root = Root(id: RootId(1), path: rootPath, name: 'Docs', status: RootStatus.watching);
     final random = Random(20261107);
     var rejected = 0;
     var accepted = 0;
@@ -81,7 +76,11 @@ void main() {
           isTrue,
           reason: 'dot segments survived: $relPath',
         );
-        expect(resolved.relPath.startsWith('/'), isFalse, reason: 'absolute path survived: $relPath');
+        expect(
+          resolved.relPath.startsWith('/'),
+          isFalse,
+          reason: 'absolute path survived: $relPath',
+        );
         expect(resolved.relPath.contains(':'), isFalse, reason: 'drive or ADS survived: $relPath');
       } on AppException {
         rejected++;

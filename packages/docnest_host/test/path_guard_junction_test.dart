@@ -22,11 +22,13 @@ void main() {
     outside = Directory(p.join(temp.path, 'Outside'))..createSync();
     Directory(p.join(target.path, 'normal')).createSync();
     File(p.join(outside.path, 'secret.txt')).writeAsStringSync('secret');
-    final result = Process.runSync(
-      'cmd',
-      <String>['/c', 'mklink', '/J', p.join(target.path, 'link'), outside.path],
-      runInShell: true,
-    );
+    final result = Process.runSync('cmd', <String>[
+      '/c',
+      'mklink',
+      '/J',
+      p.join(target.path, 'link'),
+      outside.path,
+    ], runInShell: true);
     junctionsSupported = result.exitCode == 0;
   });
 
@@ -42,10 +44,7 @@ void main() {
     const probe = IoPathProbe();
     expect(probe.isReparsePoint(p.join(target.path, 'link')), isTrue);
     expect(probe.isReparsePoint(p.join(target.path, 'normal')), isFalse);
-    expect(
-      probe.realPath(p.join(target.path, 'link'))!.toLowerCase(),
-      outside.path.toLowerCase(),
-    );
+    expect(probe.realPath(p.join(target.path, 'link'))!.toLowerCase(), outside.path.toLowerCase());
   });
 
   test('PathGuard blocks reads and writes through a junction', () {
@@ -61,10 +60,7 @@ void main() {
       status: RootStatus.watching,
     );
 
-    expect(
-      () => guard.resolve(root, 'link/secret.txt'),
-      throwsA(isA<PathOutsideRootException>()),
-    );
+    expect(() => guard.resolve(root, 'link/secret.txt'), throwsA(isA<PathOutsideRootException>()));
     expect(() => guard.resolve(root, 'link'), throwsA(isA<PathOutsideRootException>()));
     expect(guard.resolve(root, 'normal').relPath, 'normal');
   });

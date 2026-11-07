@@ -27,7 +27,11 @@ jobs:
           cache: true
       - run: flutter pub get
       - name: Format
-        run: dart format --output=none --set-exit-if-changed .
+        # Generated code is committed exactly as the generator emits it, so it is
+        # excluded here; a formatting pass would make the codegen check fail.
+        run: |
+          files=$(git ls-files '*.dart' | grep -vE '\.(g|freezed)\.dart$')
+          dart format --output=none --set-exit-if-changed $files
       - name: Analyze
         run: flutter analyze --fatal-infos
       - name: Import rules
