@@ -81,8 +81,11 @@ String? _violation(String relativePath, String uri, String source) {
     return 'domain layer must not depend on data layer';
   }
 
-  // 5. Platform branches only in the composition roots.
-  if (RegExp(r'Platform\.is(Windows|Android|Linux|MacOS|IOS)').hasMatch(source) &&
+  // 5. Platform branches only in the composition roots. Tests may name a
+  // platform freely: they use it to skip work that cannot run here.
+  final isTest = relativePath.contains('/test/');
+  if (!isTest &&
+      RegExp(r'Platform\.is(Windows|Android|Linux|MacOS|IOS)').hasMatch(source) &&
       !_platformAllowedSuffixes.any(relativePath.endsWith)) {
     return 'Platform.is* branch belongs in a bootstrap file';
   }
