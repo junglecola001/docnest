@@ -22,7 +22,8 @@ final appearanceProvider = AppearanceProvider._();
 /// In-memory only. Persistence arrives with the settings table in M1, which
 /// will seed [build] and write every change; until then this collection holds
 /// no storage layer, real or fake, so nothing claims to have been saved.
-final class AppearanceProvider extends $NotifierProvider<Appearance, AppearanceSettings> {
+final class AppearanceProvider
+    extends $NotifierProvider<Appearance, AppearanceSettings> {
   /// The appearance choices the running window is drawn with.
   ///
   /// In-memory only. Persistence arrives with the settings table in M1, which
