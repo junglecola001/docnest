@@ -15,10 +15,10 @@
 ## 尚未实现（按里程碑）
 
 - M1：drift 数据库与索引、文件监听、缩略图、预览（pdfrx）、托盘与单实例。
-- M2：证书生成、HTTPS/WS 服务、二维码配对、UDP 发现、`docnest_remote`。
+- M2：证书生成、HTTPS/WS 服务、二维码配对、UDP 发现、`docnest_remote` 的发现与传输队列（证书固定已完成）。
 - M3：真实传输（把 `docnest_host` 的上传状态机接到 HTTP）、前台服务、分享入口。
 
-`docnest_win32`、`docnest_remote` 尚未加入 workspace：等它们有真实内容时再加，避免空壳包。
+`docnest_win32` 尚未加入 workspace：等它真有回收站、Shell 缩略图、FileId 等 FFI 内容时再加，避免空壳包。`docnest_remote` 目前只有证书固定（`createPinnedHttpClient` / `certificateFingerprint`），有真实 TLS 服务器测试。
 
 ## 运行与验证
 
