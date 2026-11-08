@@ -123,10 +123,16 @@ jobs:
       - run: flutter pub get
       - run: flutter build windows --release
         working-directory: apps/docnest
+      - name: Package portable zip
+        shell: pwsh
+        run: >
+          Compress-Archive
+          -Path apps/docnest/build/windows/x64/runner/Release/*
+          -DestinationPath docnest-windows-x64.zip
       - uses: actions/upload-artifact@v4
         with:
-          name: docnest-windows-release
-          path: apps/docnest/build/windows/x64/runner/Release/
+          name: docnest-windows-x64
+          path: docnest-windows-x64.zip
           if-no-files-found: error
 
   build-android:
@@ -166,9 +172,10 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: dist
+          merge-multiple: true
       - uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/docnest-windows-release/**
-            dist/docnest-android-apk/*.apk
+            dist/*.zip
+            dist/*.apk
           generate_release_notes: true

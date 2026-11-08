@@ -48,6 +48,6 @@ CI（`.github/workflows/ci.yml`）跑同一组命令；Windows/Android 构建只
 
 ## 已知待确认
 
-- 许可证（prism_ui 是 GPL-3.0）：见 ADR 0001，需要决定开源 / 自用 / 闭源。
+- 许可证已定为 GPL-3.0（`LICENSE`），因为分发产物包含 prism_ui；闭源分发需要另行授权或替换 `docnest_ui` 的实现。见 ADR 0001。
 - Office 预览是否依赖本机 Office/WPS/LibreOffice。
 - 配对时「删除」权限默认是否勾选。

@@ -69,6 +69,17 @@ docs/adr/               架构决策记录
 - `build-windows` / `build-android`：仅在 main、tag、手动触发时运行，产物上传为 artifact。Android 目前沿用模板的 debug keystore 签名，正式发布前需要在 Secrets 中配置签名密钥。
 - `release`：打 `v*` tag 时汇总产物并生成 Release Notes
 
+## 下载与运行
+
+[Releases](https://github.com/junglecola001/docnest/releases) 页面提供 CI 构建的产物：
+
+| 平台 | 文件 | 用法 |
+|---|---|---|
+| Windows 10/11 x64 | `docnest-windows-x64.zip` | 解压后直接运行 `docnest.exe`（免安装；x64 版本在 ARM64 Windows 上由系统模拟运行） |
+| Android 10+ | `app-arm64-v8a-release.apk` 等 | 按机型 ABI 安装；目前用 debug 证书签名，安装时需允许「未知来源」 |
+
+当前版本（0.1.0）是 M0 外壳：资料库 / 搜索 / 传输 是诚实的空状态，**设置页可用**（强调色、配色风格、浅色/深色、液态玻璃、字号），改完立刻生效。
+
 ## 许可证
 
-待定。`prism_ui` 采用 GPL-3.0，分发方式决定后需要在 `docs/adr/0001-prism-ui-and-license.md` 记录结论。
+GPL-3.0（见 [LICENSE](LICENSE)）。原因：界面基础 `prism_ui` 采用 GPL-3.0，而 Flutter 会把依赖编译进同一个可执行文件，分发产物因此需要以 GPL-3.0 兼容的方式提供源码。若要闭源或商用，需要取得 prism_ui 作者授权，或只借鉴视觉风格、在 `docnest_ui` 内自建组件（隔离层已为此预留）。详见 `docs/adr/0001-prism-ui-and-license.md`。
